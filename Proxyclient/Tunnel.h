@@ -19,7 +19,7 @@ public:
         proxy_server_host_(psh),
         proxy_server_port_(psp),
         work_pool_(workthreadpool),
-        client_(client_) {}
+        client_(client) {}
     
     std::string getValidProxyID();
     

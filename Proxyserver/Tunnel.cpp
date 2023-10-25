@@ -29,14 +29,23 @@ void Tunnel::freeProxyConn(std::string proxy_id) {
         SPDLOG_CRITICAL("proxy_id {} is starting", proxy_id);
         return;
     }
+
+    proxy_connect_map_.erase(proxy_id);
+    {
+        std::unique_lock<std::mutex> lock(free_proxy_mutex_);
+        free_proxy_connects_.emplace_back(proxy_connect);
+    }
 }
 
 void Tunnel::shutdownPublicConn(SP_ProxyConnect proxy_connect) {
     int totalRecvConunt = proxy_connect->getTotalCount();
     int RecvCount = proxy_connect->getRecvCount();
-    //代理端数据未完全转发
-    if (RecvCount != totalRecvConunt)
+    std::cout<<"TotalRecv: "<<totalRecvConunt<<"local Serer send: "<<RecvCount<<std::endl;
+    if (RecvCount != totalRecvConunt){
+        std::cout<<"收到和本地服务器发送数据不对, TotalRecv: "<<totalRecvConunt<<"local Serer send: "<<RecvCount<<std::endl;
         return;
+    }
+        
     
     bool Free = proxy_connect->shutdownFromRemote();
     if (Free) {
@@ -45,6 +54,7 @@ void Tunnel::shutdownPublicConn(SP_ProxyConnect proxy_connect) {
 }
 
 void Tunnel::shutdownFromPublic(std::string proxy_id, u_int32_t tran_count) {
+    std::cout<<"Public Client close\n";
     bool isproxyExit;
     SP_ProxyConnect proxy_connect = proxy_connect_map_.get(proxy_id, isproxyExit);
     if (!isproxyExit)
@@ -106,6 +116,7 @@ void Tunnel::newPublicConnHandler() {
         
         SP_ProxyConnect proxy_connect = popFreeProxyConn(freeEmpty);
         if (!freeEmpty) {
+            std::cout<<"复用proxy连接\n";
             reqStartProxy(accept_fd, proxy_connect);
             wait_proxy_connect_map_.add(proxy_connect->getProxyID(), proxy_connect);
             continue;

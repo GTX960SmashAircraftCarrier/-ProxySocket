@@ -14,12 +14,14 @@ void Control::notifyClientNeedProxy(std::string tun_id) {
 }
 
 void Control::shutdownFromPublic(std::string tun_id, std::string proxy_id, u_int32_t tran_count) {
+    
     ShutdownPeerConnMsg req_msg;
     req_msg.tran_count = htonl(tran_count);
     strcpy(req_msg.tunnel_id, tun_id.c_str());
     strcpy(req_msg.proxy_id, proxy_id.c_str());
     Msg msg = MakeMsg(MsgType::ShutdownPeerConn, (char*)&req_msg, sizeof(ShutdownPeerConnMsg));
     connect_->SendMsg(msg);
+    std::cout<<"sending close fromc publick clinet\n";
 }
 
 void Control::handleNewCtlReq(void* msg, SP_CtlConnect connect) {
@@ -55,6 +57,7 @@ void Control::handleCtlConnClose(SP_CtlConnect conn) {
 }
 
 void Control::handleShutdownPublicConn(void* msg, SP_CtlConnect conn) {
+    std::cout<<"收到本地服务器关闭请求\n";
     ShutdownPeerConnMsg *req_msg = (ShutdownPeerConnMsg *)msg;
     u_int32_t theoreticalTotalRecvCount = ntohl(req_msg->tran_count);
     std::string tun_id = req_msg->tunnel_id;
@@ -72,12 +75,13 @@ void Control::handleShutdownPublicConn(void* msg, SP_CtlConnect conn) {
         SPDLOG_CRITICAL("proxy conn {} not exist", proxy_id);
         return;
     }
-
+    std::cout<<"收到本地服务器发送数目 "<<theoreticalTotalRecvCount<<std::endl;
     proxyConn->AddTotalCount(theoreticalTotalRecvCount);
     tun->shutdownPublicConn(proxyConn);
 }
 
 void Control::handleFreeProxyConnReq(void* msg, SP_CtlConnect conn) {
+    std::cout<<" 收到本地PorxyCLient 关闭PorxyConnect请求\n";
     FreeProxyConnReqMsg *req_msg = (FreeProxyConnReqMsg *)msg;
     std::string tun_id = std::string(req_msg->tun_id);
     std::string proxy_id = std::string(req_msg->proxy_id);

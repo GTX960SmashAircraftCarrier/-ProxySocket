@@ -15,7 +15,7 @@ void ClientConnect::handleRead() {
         }
 
         if (zero_count == 0 && !close_) {
-            std::cout<<"?????\n";
+            
             tunnel_->shutdownFromClient(proxy_id_,  getTranCount());
             close_ = true;
             return;

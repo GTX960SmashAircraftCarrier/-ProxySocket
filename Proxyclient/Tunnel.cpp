@@ -16,6 +16,7 @@ std::string Tunnel::getValidProxyID() {
 }
 
 void Tunnel::shutdownFromClient(std::string proxy_id, u_int32_t tran_count) {
+    std::cout<<"本地发送完毕，准备关闭本地连接\n";
     bool proxyExit;
     SP_ProxyConnect proxyconnect = proxy_connect_map.get(proxy_id, proxyExit);
     if(!proxyExit) {
@@ -26,7 +27,9 @@ void Tunnel::shutdownFromClient(std::string proxy_id, u_int32_t tran_count) {
     client_->shutdownLocal(tunnel_id_, proxy_id, tran_count);
 }
 void Tunnel::shutdonwLocalConn(SP_ProxyConnect proxyconnect) {
+    std::cout<<"关闭本地连接中\n";
     if (proxyconnect->getTotalCount() != proxyconnect->getRecvCount()) {
+            std::cout<<"存在未发送完数据\n";
             return;
         }
         bool isFree = proxyconnect->shutdownFromRemote();
@@ -40,10 +43,8 @@ void Tunnel::shutdonwLocalConn(SP_ProxyConnect proxyconnect) {
 }
 
 SP_ProxyConnect Tunnel::createProxyConn(u_int32_t proxy_port) {
-    //这里直接调用会出错，未找出原因。
-    std::string host = "127.0.0.1";
     // std::cout<<"proxyhost: "<<client_->getProxyServerHost()<<" port: "<<proxy_port<<std::endl;
-    int proxy_connect_fd = tcp_connect(host.c_str(), proxy_port);
+    int proxy_connect_fd = tcp_connect(client_->getProxyServerHost().c_str(), proxy_port);
     if (proxy_connect_fd <= 0) {
         SPDLOG_CRITICAL("connect proxy port error");
         return SP_ProxyConnect{};

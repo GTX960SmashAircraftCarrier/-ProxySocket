@@ -12,10 +12,12 @@ bool ProxyConnect::shutdownFromRemote(){
     std::unique_lock<std::mutex> lock{close_mutex_};
     shutdown(conn2fd_, SHUT_WR);
     if(half_close_){
+        std::cout<<"shutdownFromRemote: Resnet\n";
         resetConn();
         return true;
     }
     else{
+        std::cout<<"shutdownFromRemote: half closed\n";
         half_close_ = true;
     }
     return false;
@@ -23,10 +25,12 @@ bool ProxyConnect::shutdownFromRemote(){
 bool ProxyConnect::shutdownFromLocal(){
     std::unique_lock<std::mutex> lock{close_mutex_};
     if(half_close_){
+        std::cout<<"Reset proxyConnect\n";
         resetConn();
         return true;
     }
     else{
+        std::cout<<"设置Proxy conenct 为半连接状态\n";
         half_close_ = true;
     }
     return false;
@@ -52,7 +56,6 @@ void ProxyConnect::SendMsg(ProxyMsg& msg){
     loop_->ModToPoller(channel_);
 }
 int ProxyConnect::SendMsgDirct(ProxyMsg& msg){
-    std::cout<<"发送 proxymessagsse direct success\n";
     u_int32_t msg_len = msg.len;
     msg.len = htonl(msg.len);
     size_t write_ret = write(fd_, (char*)&msg, msg_len);

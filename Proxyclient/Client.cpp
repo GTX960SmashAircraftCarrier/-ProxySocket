@@ -113,12 +113,14 @@ void Client::handleShutdownLocalConn(void* msg, SP_CtlConnect) {
         SPDLOG_CRITICAL("proxy_id: {} not exist", proxy_id);
         return;
     }
+    std::cout<<"收到来自public clinet关闭请求, 共收到: "<<TotalRecvCount<<std::endl;
     proxyconnect->AddTotalCount(TotalRecvCount);
     tun->shutdonwLocalConn(proxyconnect);
 }
 
 
 void Client::shutdownLocal(std::string tun_id, std::string proxy_id, uint32_t trans_count){
+    std::cout<<"发送本地服务器关闭请求\n";
     ShutdownPeerConnMsg req_msg;
     req_msg.tran_count = htonl(trans_count);
     strcpy(req_msg.tunnel_id, tun_id.c_str());
