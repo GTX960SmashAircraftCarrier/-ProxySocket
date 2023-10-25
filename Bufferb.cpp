@@ -68,7 +68,7 @@ size_t Buffer::WriteToSocket(int fd){
 }
 
 int Buffer::getunused(){
-    if(write_pos_ > read_pos_){
+    if(write_pos_ >= read_pos_){
         return write_pos_ - read_pos_;
     }
     // |<---->|------|<------>|

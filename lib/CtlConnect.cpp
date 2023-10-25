@@ -55,7 +55,6 @@ void  CtlConnect::HandlerRead() try{
     switch (msg.type)
     {
     case MsgType::NewRequest: {
-        std::cout<<"recevieng ctl message, NewRequest"<<std::endl;
         NewRequestMsg new_ctl_req_msg;
         memcpy(&new_ctl_req_msg, msg.data, getMsgBodySize(msg));
         new_ctl_req_handler_((void*)&new_ctl_req_msg, shared_from_this());
@@ -64,7 +63,6 @@ void  CtlConnect::HandlerRead() try{
     }
     //不定长处理
     case MsgType::NewResponse:{
-        std::cout<<"recevieng ctl message, NewResponse"<<std::endl;
         size_t msg_size = getMsgBodySize(msg);
         NewResponseMsg* new_ctl_rsp_mag = (NewResponseMsg*)malloc(sizeof(NewResponseMsg) + msg_size);
         memset(new_ctl_rsp_mag->id, 0, msg_size);
@@ -75,21 +73,18 @@ void  CtlConnect::HandlerRead() try{
     }
         
     case MsgType::NewTunnelReq:{
-        std::cout<<"recevieng ctl message, NewTunnelReq"<<std::endl;
         NewTunnelReqMsg new_tunnel_req_msg;
         memcpy(&new_tunnel_req_msg, msg.data, getMsgBodySize(msg));
         new_tunnel_req_handler_((void*)&new_tunnel_req_msg, shared_from_this());
         break;
     }
     case MsgType::NewTunnelRsp:{
-        std::cout<<"recevieng ctl message, NewTunnelRsp"<<std::endl;
         NewTunnelRspMsg new_tunnel_rsp_msg;
         memcpy(&new_tunnel_rsp_msg, msg.data, getMsgBodySize(msg));
         new_tunnel_rsp_handler_((void *)&new_tunnel_rsp_msg, shared_from_this());
         break;
     }
     case MsgType::NotifyClient:{
-        std::cout<<"recevieng ctl message, NotifyClient"<<std::endl;
         NotifyClientNeedProxyMsg Notify_client_msg;
         memcpy(&Notify_client_msg, msg.data, getMsgBodySize(msg));
         notify_client_need_proxy_handler_((void*)&Notify_client_msg, shared_from_this());
@@ -97,21 +92,18 @@ void  CtlConnect::HandlerRead() try{
     }
         
     case MsgType::ShutdownPeerConn:{
-        std::cout<<"recevieng ctl message, ShutdownPeerConn"<<std::endl;
         ShutdownPeerConnMsg req_msg;
         memcpy(&req_msg, msg.data, getMsgBodySize(msg));
         notify_proxy_shutdown_peer_conn_handler_((void *)&req_msg, shared_from_this());
         break;
     }
     case MsgType::FreeConnReq:{
-        std::cout<<"recevieng ctl message, FreeConnReq"<<std::endl;
         FreeProxyConnReqMsg req_msg;
         memcpy(&req_msg, msg.data, getMsgBodySize(msg));
         free_proxy_conn_req_handler_((void *)&req_msg, shared_from_this());
         break;
     }
     default:{
-        std::cout<<"unknow header\n";
         break;
     }
         
@@ -140,7 +132,7 @@ void CtlConnect::HandlerEvery(){
     }
     
     channel_->SetEvents(EPOLLET | EPOLLIN | EPOLLRDHUP);
-    if(out_buf_->GetFreeSize() > 0)
+    if(out_buf_->getunused() > 0)
         channel_->Addevents(EPOLLOUT);
 
     loop_->ModToPoller(channel_);

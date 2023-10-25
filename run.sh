@@ -1,2 +1,2 @@
-./server/server --proxy_port=8090 --work_thread_nums=1
-./client/client  --local_server=10.101.29.12:7070 --cproxy_server=10.101.29.12:8080
+./Proxyserver/Proxyserver --proxy_port=8090 --work_thread_nums=4
+./Proxyclient/Proxyclient  --local_server=127.0.0.1:7070 --cproxy_server=127.0.0.1:8080 --work_thread_nums 4

@@ -18,7 +18,6 @@ void PublicConnect::handleRead() try{
         closed_ = true;
         return;
     }
-
     bs = splice(pipe_fd_[0], NULL, conn2fd_, NULL, bs, SPLICE_F_MOVE | SPLICE_F_NONBLOCK);
 
     if (bs < 0 ) {

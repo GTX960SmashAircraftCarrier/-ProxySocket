@@ -11,7 +11,6 @@ void Control::notifyClientNeedProxy(std::string tun_id) {
     req_msg.proxy_server_port = server_->getProxyPort();
     Msg msg = MakeMsg(MsgType::NotifyClient, (char*)&req_msg, sizeof(NotifyClientNeedProxyMsg));
     connect_->SendMsg(msg);
-    std::cout<<"send notifyClientNeedProxy success\n";
 }
 
 void Control::shutdownFromPublic(std::string tun_id, std::string proxy_id, u_int32_t tran_count) {
@@ -24,7 +23,6 @@ void Control::shutdownFromPublic(std::string tun_id, std::string proxy_id, u_int
 }
 
 void Control::handleNewCtlReq(void* msg, SP_CtlConnect connect) {
-    std::cout<<"接受到客户端ctl连接请求\n";
     std::string ctl_id = connect->GetId();
     NewResponseMsg* req_msg = (NewResponseMsg*)malloc(sizeof(NewResponseMsg) + ctl_id.size() + 1);
     memset(req_msg->id, 0, ctl_id.size() + 1);
@@ -33,11 +31,9 @@ void Control::handleNewCtlReq(void* msg, SP_CtlConnect connect) {
     Msg ctl_msg = MakeMsg(MsgType::NewResponse, (char*)req_msg, sizeof(NewResponseMsg) + ctl_id.size() + 1);
     connect->SendMsg(ctl_msg);
     free(req_msg);
-    std::cout<<"发送客户端ctl连接请求\n";
 }
 
 void Control::handleNewTunnelReq(void* msg, SP_CtlConnect connect) {
-    std::cout<<"接受到客户端隧道请求\n";
     NewTunnelReqMsg* req_msg = (NewTunnelReqMsg*)msg;
     std::string rand_id = random_str(5);
     SP_Tunnel tunnel(new Tunnel(rand_id, server_->publicListenThread_, server_->eventLoopThreadPool_, shared_from_this()));
@@ -49,12 +45,9 @@ void Control::handleNewTunnelReq(void* msg, SP_CtlConnect connect) {
     strcpy(rsp_msg.tunnel_id, rand_id.c_str());
     strcpy(rsp_msg.proxy_server_host, (tunnel->getListenAddr()).c_str());
     strcpy(rsp_msg.server_host, req_msg->server_host);
-    std::cout<<"rsp proxy port: "<<rsp_msg.proxy_server_port<<std::endl;
-    std::cout<<"rsp proxy listen host: "<<rsp_msg.proxy_server_host<<std::endl;
 
     Msg ctl_msg = MakeMsg(MsgType::NewTunnelRsp, (char*)&rsp_msg, sizeof(NewTunnelRspMsg));
     connect_->SendMsg(ctl_msg);
-    std::cout<<"发送回应客户端隧道请求\n";
 }
 
 void Control::handleCtlConnClose(SP_CtlConnect conn) {

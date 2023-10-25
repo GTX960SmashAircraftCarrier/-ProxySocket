@@ -40,12 +40,10 @@ void Tunnel::shutdonwLocalConn(SP_ProxyConnect proxyconnect) {
 }
 
 SP_ProxyConnect Tunnel::createProxyConn(u_int32_t proxy_port) {
-    std::cout<<"建立代理中....\n";
-    std::string host = "10.101.29.12";
+    //这里直接调用会出错，未找出原因。
+    std::string host = "127.0.0.1";
     // std::cout<<"proxyhost: "<<client_->getProxyServerHost()<<" port: "<<proxy_port<<std::endl;
-    std::cout<<"server_host_: "<<host<<" server_port_"<<proxy_port<<std::endl;
     int proxy_connect_fd = tcp_connect(host.c_str(), proxy_port);
-    std::cout<<"proxy_connect_fd "<<proxy_connect_fd<<std::endl;
     if (proxy_connect_fd <= 0) {
         SPDLOG_CRITICAL("connect proxy port error");
         return SP_ProxyConnect{};
@@ -60,24 +58,19 @@ SP_ProxyConnect Tunnel::createProxyConn(u_int32_t proxy_port) {
     //生成随机ID
     std::string proxyid = getValidProxyID();
     proxyConnect->setProxyID(proxyid);
-    std::cout<<"建立代理成功\n";
     return proxyConnect;
 }
 SP_ClientConnect Tunnel::createLocalConn(SP_ProxyConnect ProxyConnect) {
-    std::cout<<"建立本地连接中\n";
-    std::cout<<"server_host_: "<<server_host_<<" server_port_"<<server_port_<<std::endl;
     int local_fd = tcp_connect(server_host_.c_str(), server_port_);
     if (local_fd <= 0) {
         SPDLOG_CRITICAL("connect proxy port error");
         return SP_ClientConnect{};
     }
     SP_ClientConnect clientconn(new ClientConnect(local_fd, ProxyConnect->getThread(), this, ProxyConnect->getProxyID()));
-    std::cout<<"与本地建立连接成功\n";
     return clientconn;
 }
 
 void Tunnel::HandleProxyConnectReq(void* msg, SP_ProxyConnect proxy_connect) {
-    std::cout<<"recving ProxyConnectReqMsg\n";
     ProxyConnectReqMsg* proxy_connect_req_msg = (ProxyConnectReqMsg*)msg;
     std::string proxy_id = proxy_connect_req_msg->proxy_id;
     u_int32_t fd = ntohl(proxy_connect_req_msg->fd);
@@ -91,9 +84,7 @@ void Tunnel::HandleProxyConnectReq(void* msg, SP_ProxyConnect proxy_connect) {
         SPDLOG_CRITICAL("proxyConn {} is starting, cannot start again", proxy_id);
         return;
     }
-    std::cout<<"与本地服务器建立连接中\n";
     SP_ClientConnect ClientConnect = createLocalConn(proxyconnect);
-    std::cout<<"与本地服务器建立连接中成功\n";
     
     ProxyConnectRspMsg proxy_connect_rsp_msg;
     strcpy(proxy_connect_rsp_msg.proxy_id, proxy_id.c_str());

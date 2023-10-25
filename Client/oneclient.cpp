@@ -27,7 +27,7 @@ int main(){
     signal(SIGINT, sig_handler);
 
     EasyClient client;
-    client.Connect("127.0.0.1", 7777);
+    client.Connect("127.0.0.1",7777);
 
     std::thread t1(receive_thread, &client);
 	t1.detach();
@@ -39,14 +39,13 @@ int main(){
 	// 	strcpy(login[n].pwd, "123");
 	// }
     // ClientLogin login;
-	std::this_thread::sleep_for(std::chrono::milliseconds(4000));
     std::shared_ptr<ClientLogin> login = std::make_shared<ClientLogin>();
     while(keepRunning){
-        std::cout<<"sending \n";
+        // std::cout<<"sending \n";
         if(client.SendData(login) == 0){
             std::cout<<"full sendbuf\n";
         }
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        // std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
    
     sleep(2);

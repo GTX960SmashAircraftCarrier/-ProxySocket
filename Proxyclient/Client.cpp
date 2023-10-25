@@ -25,7 +25,6 @@ void Client::Run() {
 
 void Client::initConnect() {
     //TCP连接
-    std::cout<<proxy_server_host_.c_str()<<" "<<proxy_server_port_<<std::endl;
     int connect_fd = tcp_connect(proxy_server_host_.c_str(), proxy_server_port_);
     assert(connect_fd > 0);
     SP_CtlConnect connect(new CtlConnect(connect_fd, loop_));
@@ -42,7 +41,6 @@ void Client::NewCtlReq() {
     NewRequestMsg req_msg = NewRequestMsg{};
     Msg msg = MakeMsg(MsgType::NewRequest, (char *)(&req_msg), sizeof(req_msg));
     ctlconnect_->SendMsg(msg);
-    std::cout<<"与服务器建立ctl请求成功\n";
 }
 
 void Client::NewTunnelReq() {
@@ -51,13 +49,10 @@ void Client::NewTunnelReq() {
     strcpy(req_msg.server_host, server_host_.c_str());
     Msg msg = MakeMsg( MsgType::NewTunnelReq, (char *)(&req_msg), sizeof(req_msg));
     ctlconnect_->SendMsg(msg);
-    std::cout<<"与服务器建立隧道请求发送\n";
 }
 
 void Client::handleNewCtlRsp(void* msg, SP_CtlConnect conn) {
-    std::cout<<"接收到服务器ctl回应,准备建立隧道\n";
     NewResponseMsg *new_rsp_msg = (NewResponseMsg *)msg;
-    std::cout<<"收到服务器id : "<<std::string(new_rsp_msg->id) <<std::endl;
     conn->SetCtlId(std::string(new_rsp_msg->id));
     client_id_ = std::string(new_rsp_msg->id);
     NewTunnelReq();
@@ -72,11 +67,9 @@ void Client::handleNewTunnelRsp(void* msg, SP_CtlConnect conn) {
                             rsp_msg->proxy_server_port,  thead_event_pool_, this});
     SPDLOG_INFO("tunnel addr:{}:{}", rsp_msg->proxy_server_host, rsp_msg->proxy_server_port);
     tunnel_map_.emplace(rsp_msg-> tunnel_id, tun);
-    std::cout<<"隧道建立成功\n";
 }
 
 void Client::handleProxyNotify(void*msg, SP_CtlConnect) {
-    std::cout<<"接收到服务器有客户到来\n";
     NotifyClientNeedProxyMsg *req_msg = (NotifyClientNeedProxyMsg*)msg;
     std::string tunnel_id = req_msg->tunnel_id;
     if(tunnel_map_.find(tunnel_id) == tunnel_map_.end()) {
@@ -84,8 +77,6 @@ void Client::handleProxyNotify(void*msg, SP_CtlConnect) {
         return;
     }
     SP_Tunnel tunnel = tunnel_map_[tunnel_id];
-    // std::cout<<"tunnel fd :" <<tu
-    std::cout<<"proxyhost: "<<proxy_server_host_<<" port: "<<req_msg->proxy_server_port<<std::endl;
     SP_ProxyConnect proxyconnect = tunnel->createProxyConn(req_msg->proxy_server_port);
     
     (tunnel->proxy_connect_map).add(proxyconnect->getProxyID(), proxyconnect);
@@ -102,7 +93,6 @@ void Client::handleProxyNotify(void*msg, SP_CtlConnect) {
         return;
     }
     // proxyconnect->SendMsg(proxy_msg);
-    std::cout<<"发送proxy服务器代理同步消息\n";
     proxyconnect->Run(clientconnect);
 }
 

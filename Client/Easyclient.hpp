@@ -40,6 +40,7 @@ public:
         serverAddress.sin_addr.s_addr = inet_addr(ip);
         serverAddress.sin_port = htons(port);
         int connect_state = connect(clientSocket, (struct sockaddr*)&serverAddress, sizeof(serverAddress));
+        std::cout<<"client fd is "<<connect_state<<std::endl;
         if(connect_state < 0){
             Close();
             std::cerr<<"Error connecting server socket"<<std::endl;
@@ -110,6 +111,7 @@ public:
     }
 
     int Message(DataHeader* header){
+        // std::cout<<"sdsss\n";
         ++_recvcount;
         switch(header->cmd){
             case CMD_LOGIN_RESULT:{

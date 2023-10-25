@@ -14,11 +14,13 @@ class Tunnel;
 
 class ClientConnect : public TransConnect, public std::enable_shared_from_this<ClientConnect> {
 public:
-    ClientConnect(int fd, SP_ThreadEventloop thread, Tunnel* tunnel, std::string proxy_id) : TransConnect{fd, thread}, tunnel_(tunnel), proxy_id_(proxy_id), close_(false) {
+    ClientConnect(int fd, SP_ThreadEventloop thread, Tunnel* tunnel, std::string proxy_id) : TransConnect(fd, thread), tunnel_(tunnel), proxy_id_(proxy_id), close_(false) {
+        
         channel_->SetEvents(EPOLLET | EPOLLIN | EPOLLRDHUP);
         channel_->SetReadHandler(std::bind(&ClientConnect::handleRead, this));
         channel_->SetEveryHandler(std::bind(&ClientConnect::everyHandle, this));
         channel_->SetNeedCloseWhenDelete(false);
+        std::cout<<"localServerconnect  init success\n";
     }
     ~ClientConnect(){
         std::cout<<"ClientConnect is close\n";

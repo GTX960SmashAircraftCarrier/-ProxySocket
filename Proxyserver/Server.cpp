@@ -41,7 +41,6 @@ void Server::newCtlConnHandler() try{
         while (control_map_.find(ctl_id) != control_map_.end()) {
             ctl_id = random_str(5);
         }
-        std::cout<<"新添加contorl id: "<<ctl_id<<std::endl;
         SP_Control ctl(new Control(accept_fd, ctl_id, loop_, this));
         control_map_.emplace(ctl_id, ctl);
     }
@@ -79,7 +78,6 @@ void Server::everyHandler() {
 }
 
 void Server::claimProxyConn(void* msg, SP_ProxyConnect conn) {
-    std::cout<<"接受到proxy同步设置信息\n";
     ProxyMetaSetMsg *proxy_meta_set_msg = (ProxyMetaSetMsg *)msg;
     std::string ctl_id = std::string(proxy_meta_set_msg->ctl_id);
     std::string tun_id = std::string(proxy_meta_set_msg->tun_id);

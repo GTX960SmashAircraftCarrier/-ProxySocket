@@ -6,7 +6,8 @@
 #include "Tunnel.h"
 #include "lib/Utils.h"
 
-void ClientConnect::handleRead() try{
+void ClientConnect::handleRead() {
+    try{
         int zero_count = splice(fd_, NULL, pipe_fd_[1], NULL, 2048, SPLICE_F_MOVE | SPLICE_F_NONBLOCK);
         if (zero_count < 0) {
             SPDLOG_CRITICAL("proxy_id: {} local_fd: {} -> pipe_fd: {} splice err: {} ", proxy_id_, fd_,pipe_fd_[1], strerror(errno));
@@ -14,6 +15,7 @@ void ClientConnect::handleRead() try{
         }
 
         if (zero_count == 0 && !close_) {
+            std::cout<<"?????\n";
             tunnel_->shutdownFromClient(proxy_id_,  getTranCount());
             close_ = true;
             return;
@@ -27,12 +29,13 @@ void ClientConnect::handleRead() try{
         AddTranCount(zero_count);
     } catch (const std::exception& e) {
         SPDLOG_CRITICAL("read local_conn except: {}", e.what());
+    }   
 }
 
 void ClientConnect::everyHandle() {
-        if (close_){
-            return;
-        }
-        channel_->SetRevents(EPOLLET | EPOLLIN | EPOLLRDHUP);
-        loop_->ModToPoller(channel_);
+    if (close_){
+        return;
+    }
+    channel_->SetEvents(EPOLLET | EPOLLIN | EPOLLRDHUP);
+    loop_->ModToPoller(channel_);
 }

@@ -64,7 +64,6 @@ int ProxyConnect::SendMsgDirct(ProxyMsg& msg){
 }
 
 void ProxyConnect::Run(SP_TransConnect connect){
-    std::cout<<"proxyCOnenct is runing \n";
     start_ = true;
     conn_ = connect;
     setConn2fd(connect->getFd());
@@ -74,7 +73,6 @@ void ProxyConnect::Run(SP_TransConnect connect){
 }
 
 void ProxyConnect::handleRead(){
-    std::cout<<"proxy reveing message\n";
     if(start_) {
         // splice 两个描述符传输，零拷贝
         int bs = splice(fd_, NULL, pipe_fd_[1], NULL, 2048, SPLICE_F_MOVE | SPLICE_F_NONBLOCK);
@@ -132,21 +130,18 @@ void ProxyConnect::handleRead(){
     switch ((msg.type))
     {
     case ProxyMsgType::ProxyMetaSet : {
-        std::cout<<"接收到proxy客户端proxy设置信息\n";
         ProxyMetaSetMsg proxy_meta_set_msg;
         memcpy(&proxy_meta_set_msg, msg.data, getProxyMsgBodySize(msg));
         proxyMetaSetHandler_((void*)&proxy_meta_set_msg, shared_from_this());
         break;
     }
     case ProxyMsgType::ProxyConnectReq : {
-        std::cout<<"接收到proxy客户端proxyReq信息\n";
         ProxyConnectReqMsg proxy_connect_req_msg;
         memcpy(&proxy_connect_req_msg, msg.data, getProxyMsgBodySize(msg));
         startProxyConnReqHandler_((void*)&proxy_connect_req_msg, shared_from_this());
         break;
     }
     case ProxyMsgType::ProxyConnectRsp : {
-        std::cout<<"接收到proxy服务器proxyrsp信息\n";
         ProxyConnectRspMsg proxy_connect_rsq_msg;
         memcpy(&proxy_connect_rsq_msg, msg.data, getProxyMsgBodySize(msg));
         startProxyConnRspHandler_((void*)&proxy_connect_rsq_msg, shared_from_this());
@@ -163,6 +158,7 @@ void ProxyConnect::handleWrite(){
     if(sent_ret <= 0) SPDLOG_CRITICAL("sent to fd err");
     if(buf_->getunused() > 0) channel_->Addevents(EPOLLOUT);
 }
+
 void ProxyConnect::everyHandle(){
     if (in_buffer_empty_ && channel_->IsClosed()) {
         close_handler_(shared_from_this());
@@ -170,7 +166,7 @@ void ProxyConnect::everyHandle(){
     }
     channel_->SetEvents(EPOLLET | EPOLLIN | EPOLLRDHUP);
     //未完全发送
-    if(buf_->GetFreeSize() > 0) {
+    if(buf_->getunused() > 0) {
         channel_->Addevents(EPOLLOUT);
     }
     loop_->ModToPoller(channel_);

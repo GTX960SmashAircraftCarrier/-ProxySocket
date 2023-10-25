@@ -4,7 +4,7 @@
 #include "TimeStamp.hpp"
 #include "ThreadBuffer.hpp"
 #ifndef MaxBufSize
-#define MaxBufSize  40960
+#define MaxBufSize  81920
 #endif
 //客户端不操作断开限制
 #define ExpireTime 50000

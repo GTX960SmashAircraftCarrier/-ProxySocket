@@ -25,7 +25,7 @@ g++ -o Client/client Client/client.cpp -lpthread
 g++ -o Server/server Server/server.cpp -lpthread
 
 # 启动proxy server
-./Proxyerver/Proxyserver --proxy_port=8090 --work_thread_nums=1
+./Proxyserver/Proxyserver --proxy_port=8090 --work_thread_nums=1
 ./Proxyclient/Proxyclient  --local_server=10.101.29.12:7070 --cproxy_server=10.101.29.12:8080
 
 ./Server/server

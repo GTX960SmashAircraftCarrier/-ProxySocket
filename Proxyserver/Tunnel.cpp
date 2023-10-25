@@ -61,12 +61,10 @@ void Tunnel::reqStartProxy(int public_fd, SP_ProxyConnect proxy_conn) {
 
     ProxyMsg proxy_msg = makeProxyMsg(ProxyMsgType::ProxyConnectReq, (char*)&req_msg, sizeof(ProxyConnectReqMsg));
     proxy_conn->SendMsg(proxy_msg);
-    std::cout<<"sending ProxyConnectReqMsg\n";
 
 }
 
 void Tunnel::bindPublicFdToProxyConn(int public_fd, SP_ProxyConnect proxy_conn) {
-    std::cout<<"代理与外部连接简历中\n";
     SP_PublicConnect public_connect(new PublicConnect(public_fd, proxy_conn->getThread(), this, proxy_conn->getProxyID()));
     proxy_conn->Run(public_connect);
     proxy_connect_map_.add(proxy_conn->getProxyID(), proxy_conn);
@@ -98,7 +96,6 @@ SP_ProxyConnect Tunnel::getProxyConn(std::string proxy_id, bool& isExist) {
 
 //外部连接
 void Tunnel::newPublicConnHandler() {
-    std::cout<<"newPublicConnect\n";
     struct sockaddr_in client_addr;
     memset(&client_addr, 0, sizeof(client_addr));
     socklen_t client_addr_len = sizeof(client_addr);
@@ -108,7 +105,6 @@ void Tunnel::newPublicConnHandler() {
         bool freeEmpty;
         
         SP_ProxyConnect proxy_connect = popFreeProxyConn(freeEmpty);
-        std::cout<<freeEmpty<<" :popFreeProxyConn succecc\n";
         if (!freeEmpty) {
             reqStartProxy(accept_fd, proxy_connect);
             wait_proxy_connect_map_.add(proxy_connect->getProxyID(), proxy_connect);
@@ -131,7 +127,6 @@ void Tunnel::addCtlPendingFunctor(std::function<void()>&&) {
 }
 
 void Tunnel::handleStartProxyConnRsp(void* msg, SP_ProxyConnect proxy_connect) {
-    std::cout<<"接受建立代理请求\n";
     ProxyConnectRspMsg* rsp_msg = (ProxyConnectRspMsg*)msg;
     u_int32_t public_fd = ntohl(rsp_msg->fd);
     std::string proxy_id = proxy_connect->getProxyID();
@@ -139,7 +134,6 @@ void Tunnel::handleStartProxyConnRsp(void* msg, SP_ProxyConnect proxy_connect) {
         SPDLOG_CRITICAL("proxy_id {} not exist in wait_for_start_proxy_conn_map", proxy_id);
         return;
     }
-    std::cout<<"与公共服务器合并\n";
     bindPublicFdToProxyConn(public_fd, proxy_connect);
     wait_proxy_connect_map_.erase(proxy_id);
 }

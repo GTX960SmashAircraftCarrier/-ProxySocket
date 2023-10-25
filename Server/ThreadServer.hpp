@@ -77,7 +77,6 @@ public:
 				std::this_thread::sleep_for(t);
 				continue;
 			}
-             
             fd_set fdRead, fdWrite, fdErro;
             if(clientchange){
                 clientchange = false;
@@ -92,7 +91,7 @@ public:
             else{
                 memcpy(&fdRead, &fdRead_back, sizeof(fd_set));
             }
-            memcpy(&fdWrite, &fdRead_back, sizeof(fd_set));
+            memcpy(&fdWrite, &fdRead, sizeof(fd_set));
             // memcpy(&fdErro, &fdRead_back, sizeof(fd_set));
 
             timeval t{0, 10};

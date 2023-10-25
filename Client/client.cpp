@@ -38,7 +38,7 @@ void sendThread(int id){
     for(int i = begin; i < end; i++)
         client[i] = new EasyClient();
     for(int i = begin; i < end; i++)
-        client[i]->Connect("10.101.29.12", 7070);
+        client[i]->Connect("127.0.0.1", 7777);
 
     printf("thread<%d>,Connect<begin=%d, end=%d>\n", id, begin, end);
 
@@ -51,22 +51,24 @@ void sendThread(int id){
     std::thread t1(receive_thread, begin, end);
 	t1.detach();
 
-    ClientLogin login[10];
-	for (int n = 0; n < 10; n++)
-	{
-		strcpy(login[n].user, "cqy");
-		strcpy(login[n].pwd, "123");
-	}
-	const int nLen = sizeof(login);
+    std::shared_ptr<ClientLogin> login = std::make_shared<ClientLogin>();
+    strcpy(login->pwd, "123");
+    strcpy(login->user, "cqy");
+	// for (int n = 0; n < 10; n++)
+	// {
+	// 	strcpy(login[n].user, "cqy");
+	// 	strcpy(login[n].pwd, "123");
+	// }
+	// const int nLen = sizeof(login);
 
     while(keepRunning){
-        for (int n = begin; n < end; n++)
-		{
-			if (client[n]->SendData(login, nLen) != -1)
-			{
-				Sendcount++;
-			}
-		}
+        // for (int n = begin; n < end; n++)
+		// {
+		// 	if (client[n]->SendData(login) != 0)
+		// 	{
+		// 		Sendcount++;
+		// 	}
+		// }
         std::chrono::milliseconds t(100);
 		std::this_thread::sleep_for(t);
     }
@@ -105,7 +107,7 @@ int main(){
     }
 
 
-    sleep(10);
+    sleep(3);
     std::cout<<"all done\n";
     return 0;
 }

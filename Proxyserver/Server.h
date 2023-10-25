@@ -29,8 +29,6 @@ public:
         proxyListenfd_(sockt_bind_listen(ProxyPort)),
         loop_(new EventLoop()) {
         //ctl
-        std::cout<<"ctlListenfd_"<<ctlListenfd_<<std::endl;
-        std::cout<<"proxyListenfd_"<<proxyListenfd_<<std::endl;
         if (ctlListenfd_ < 0) {
             perror("listen socket fail");
             abort();
