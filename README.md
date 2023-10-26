@@ -36,6 +36,14 @@ g++ -o Server/server Server/server.cpp -lpthread
 
 ## 并发结构
 ### 客户端架构
-![](https://raw.githubusercontent.com/GTX960SmashAircraftCarrier/imgs/master/20231026102910.png)
+ <div align=center> <img src="https://raw.githubusercontent.com/GTX960SmashAircraftCarrier/imgs/master/20231026102910.png" style="zoom:50%"></div>
+
 ### 服务端架构
-![](https://raw.githubusercontent.com/GTX960SmashAircraftCarrier/imgs/master/20231026102916.png)
+ <div align=center> <img src="https://raw.githubusercontent.com/GTX960SmashAircraftCarrier/imgs/master/20231026102916.png" style="zoom:50%"></div>
+
+ ### ProxyClient架构
+
+<div align=center> <img src="https://raw.githubusercontent.com/GTX960SmashAircraftCarrier/imgs/master/20231026191006.png" style="zoom:50%"></div>
+
+### ProxyServer架构
+  <div align=center> <img src="https://raw.githubusercontent.com/GTX960SmashAircraftCarrier/imgs/master/20231026191019.png" style="zoom:50%"></div>
