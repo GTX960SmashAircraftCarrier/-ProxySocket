@@ -32,8 +32,10 @@ g++ -o Server/server Server/server.cpp -lpthread
 ./Client/client
 ```
 ## 运行细节
-![](https://raw.githubusercontent.com/GTX960SmashAircraftCarrier/imgs/master/20231023172216.png)
+![](https://raw.githubusercontent.com/GTX960SmashAircraftCarrier/imgs/master/20231026100212.png)
 
 ## 并发结构
-
-## 优雅断开
+### 客户端架构
+![](https://raw.githubusercontent.com/GTX960SmashAircraftCarrier/imgs/master/20231026102910.png)
+### 服务端架构
+![](https://raw.githubusercontent.com/GTX960SmashAircraftCarrier/imgs/master/20231026102916.png)
